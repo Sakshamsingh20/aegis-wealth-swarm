@@ -5,3 +5,6 @@ numpy
 scikit-learn
 plotly
 google-generativeai
+ta
+beautifulsoup4
+requests

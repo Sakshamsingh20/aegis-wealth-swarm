@@ -1,48 +1,30 @@
-# 🤖 FinSwarm: Agentic Portfolio Simulator
+# 🛡️ Aegis: Autonomous Wealth Swarm
 
-An intermediate-level AI/ML project showcasing the powerful combination of Machine Learning (Time-Series Forecasting), Generative AI, and Agentic workflows.
+**The ultimate fusion of Quantitative Finance, Generative AI, and Agentic Swarms.**
 
-## 🌟 Overview
-FinSwarm is an interactive web dashboard built with Streamlit. It demonstrates a complex AI pipeline:
-1. **Machine Learning:** Pulls real-time financial data using `yfinance` and runs a linear regression time-series forecast to predict future stock movements.
-2. **Generative AI:** Uses LLMs (Google Gemini) to synthesize the numerical data into natural language.
-3. **Agentic AI:** Spawns multiple AI agents with distinct personas (Conservative Risk-Averse vs. Aggressive Momentum-Driven). The agents ingest the ML forecast and debate one another before a Moderator agent steps in to issue a final Buy/Hold/Sell consensus.
+Aegis is an institutional-grade portfolio simulator that transcends basic AI chatbots. It simulates a fully autonomous hedge fund by combining advanced Machine Learning, real-time news scraping, and a multi-agent AI debate system to make data-driven financial decisions.
 
-This project perfectly illustrates how AI can move beyond just Chatbots into autonomous, decision-making workflows based on statistical data.
+## 🌟 Next-Level Architecture
+1. **Quantitative ML Engine (`quant_engine.py`):** Uses the `ta` library to compute RSI, MACD, and Bollinger Bands. Trains a `GradientBoostingRegressor` to predict 7-day forward returns based on technical momentum.
+2. **Account Growth Simulator (`backtester.py`):** A custom backtesting engine that simulates what would happen if you gave the AI Swarm $10,000 two years ago. Compares the AI's equity curve against traditional Buy & Hold.
+3. **News Sentiment Scraper:** Uses `BeautifulSoup` to scrape live Yahoo Finance headlines to inject real-world macroeconomic context into the AI.
+4. **Agentic Swarm (`swarm_agents.py`):** Utilizes Google Gemini to spawn highly specialized agents (Macro-Economist, Quant Analyst, Risk Manager). They debate the ML data and output a structured JSON consensus for the Execution Engine.
 
-## 🚀 Features
-*   **Live Data:** Fetches real market history using `yfinance`.
-*   **ML Forecasting:** Uses scikit-learn to predict 7-day future price movements.
-*   **Agentic Debate:** Connects to the Gemini API to trigger dynamic prompt-chained debates between AI personas.
-*   **Interactive UI:** Beautiful data visualization using Plotly within a Streamlit app.
-*   **API Fallback:** Automatically falls back to a mock engine if no API key is provided, ensuring the demo always works for recruiters!
+## 🚀 How to Run
 
-## 🛠️ Installation & Setup
-
-1. **Clone the repository** (if you haven't already):
-   ```bash
-   git clone <your-repo-url>
-   cd finswarm_project
-   ```
-
-2. **Install Dependencies:**
-   Make sure you have Python installed. Then run:
+1. **Install Dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **(Optional) Set API Key:**
-   To enable the real AI Agent debate, set your Gemini API key:
-   *   **Windows:** `set GEMINI_API_KEY="your-api-key"`
-   *   **Mac/Linux:** `export GEMINI_API_KEY="your-api-key"`
-
-4. **Run the App:**
+2. **Run the Dashboard:**
    ```bash
    streamlit run app.py
    ```
 
-## 🧠 Why this project stands out on a resume:
-Instead of just calling an API, this project demonstrates **AI Engineering**. It shows you can build full-stack data apps, handle data manipulation (`pandas`, `numpy`), apply statistical modeling (`scikit-learn`), and engineer complex LLM workflows (Agentic Debates) in a cohesive, user-friendly product.
-
----
-*Built as a portfolio piece to demonstrate applied Agentic AI & ML.*
+## 🌐 How to Deploy (For Free)
+To show this off to 10M+ people on LinkedIn, deploy it to Streamlit Community Cloud:
+1. Push this repository to your GitHub account.
+2. Go to [share.streamlit.io](https://share.streamlit.io/)
+3. Click "New App", select your GitHub repository, and type `app.py` as the Main file path.
+4. Click Deploy! In 2 minutes, you will have a public URL to share on your resume and LinkedIn.
