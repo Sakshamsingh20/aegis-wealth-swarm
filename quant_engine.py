@@ -32,7 +32,7 @@ def fetch_advanced_data(ticker, period="2y"):
     df['SMA_200'] = ta.trend.SMAIndicator(close=df['Close'], window=200).sma_indicator()
     
     # Clean NaN values caused by rolling windows
-    df = df.fillna(method='bfill').fillna(0)
+    df = df.bfill().fillna(0)
     
     return df
 
