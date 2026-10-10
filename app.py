@@ -168,30 +168,34 @@ elif page == "🤖 AI Swarm Fund":
     if st.sidebar.button("Deploy AI Swarm", type="primary"):
         with st.spinner(f"Fetching Institutional Data for {ticker}..."):
             df = fetch_advanced_data(ticker, "2y")
-            current_price = df['Close'].iloc[-1]
             
-            with st.spinner("Training ML Model & Scraping News..."):
-                forecast_prices, ml_confidence = run_quant_forecast(df)
-                swarm_result = run_aegis_swarm(ticker, current_price, forecast_prices, ml_confidence, df)
-            
-            tab1, tab2 = st.tabs(["AI Verdict", "Account Growth Backtest"])
-            with tab1:
-                exec_data = swarm_result['execution']
-                decision_color = "#00D09C" if exec_data['decision'] == "BUY" else "#FF5252" if exec_data['decision'] == "SELL" else "gray"
-                st.markdown(f"<h2 style='color: {decision_color};'>ACTION: {exec_data['decision']} (Confidence: {exec_data['confidence_score']}%)</h2>", unsafe_allow_html=True)
+            if df is None or df.empty or 'RSI' not in df.columns:
+                st.error(f"⚠️ Insufficient historical trading data to analyze {raw_ticker}. The AI requires at least 50 days of market history to compute Technical Indicators. Please try a widely traded stock (like RELIANCE, TCS, or AAPL).")
+            else:
+                current_price = df['Close'].iloc[-1]
                 
-                for log in swarm_result['logs']:
-                    st.markdown(f"<div class='agent-box'><strong>{log['agent']}</strong><br>{log['content']}</div>", unsafe_allow_html=True)
-            
-            with tab2:
-                bt_df, bt_metrics = run_backtest(df)
-                if bt_df is not None:
-                    st.success("Backtest Complete: Initial Capital ₹10,000")
-                    fig_bt = go.Figure()
-                    fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['Buy_Hold_Portfolio'], mode='lines', name='Buy & Hold'))
-                    fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['AI_Portfolio'], mode='lines', name='Aegis Managed', line=dict(color='#00BFFF', width=2)))
-                    fig_bt.update_layout(height=400, template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
-                    st.plotly_chart(fig_bt, use_container_width=True)
+                with st.spinner("Training ML Model & Scraping News..."):
+                    forecast_prices, ml_confidence = run_quant_forecast(df)
+                    swarm_result = run_aegis_swarm(ticker, current_price, forecast_prices, ml_confidence, df)
+                
+                tab1, tab2 = st.tabs(["AI Verdict", "Account Growth Backtest"])
+                with tab1:
+                    exec_data = swarm_result['execution']
+                    decision_color = "#00D09C" if exec_data['decision'] == "BUY" else "#FF5252" if exec_data['decision'] == "SELL" else "gray"
+                    st.markdown(f"<h2 style='color: {decision_color};'>ACTION: {exec_data['decision']} (Confidence: {exec_data['confidence_score']}%)</h2>", unsafe_allow_html=True)
+                    
+                    for log in swarm_result['logs']:
+                        st.markdown(f"<div class='agent-box'><strong>{log['agent']}</strong><br>{log['content']}</div>", unsafe_allow_html=True)
+                
+                with tab2:
+                    bt_df, bt_metrics = run_backtest(df)
+                    if bt_df is not None:
+                        st.success("Backtest Complete: Initial Capital ₹10,000")
+                        fig_bt = go.Figure()
+                        fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['Buy_Hold_Portfolio'], mode='lines', name='Buy & Hold'))
+                        fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['AI_Portfolio'], mode='lines', name='Aegis Managed', line=dict(color='#00BFFF', width=2)))
+                        fig_bt.update_layout(height=400, template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
+                        st.plotly_chart(fig_bt, use_container_width=True)
 
 elif page == "🚀 IPO & GMP Center":
     st.title("🚀 Upcoming IPOs & Grey Market Premium (GMP)")
