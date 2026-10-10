@@ -202,31 +202,49 @@ elif page == "🚀 IPO & GMP Center":
     st.markdown("Live tracking of upcoming IPOs, estimated listing gains, and subscription status.")
     
     st.markdown("""
-    <div class="ipo-card">
-        <h4>Swiggy Ltd. IPO</h4>
-        <p><strong>Open Date:</strong> Nov 08, 2026 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Close Date:</strong> Nov 11, 2026</p>
-        <p><strong>Issue Price:</strong> ₹370 - ₹390 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Lot Size:</strong> 65 Shares</p>
-        <hr>
-        <p><strong>Current GMP:</strong> <span style="color:#00D09C; font-weight:bold; font-size:18px;">₹120</span> <span style="color:gray;">(+30.7%)</span></p>
-        <p><strong>Est. Listing Price:</strong> ₹510</p>
-    </div>
-    
-    <div class="ipo-card">
-        <h4>NTPC Green Energy Ltd.</h4>
-        <p><strong>Open Date:</strong> Nov 15, 2026 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Close Date:</strong> Nov 18, 2026</p>
-        <p><strong>Issue Price:</strong> ₹100 - ₹108 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Lot Size:</strong> 138 Shares</p>
-        <hr>
-        <p><strong>Current GMP:</strong> <span style="color:#00D09C; font-weight:bold; font-size:18px;">₹25</span> <span style="color:gray;">(+23.1%)</span></p>
-        <p><strong>Est. Listing Price:</strong> ₹133</p>
-    </div>
-    
-    <div class="ipo-card">
-        <h4>Hyundai Motor India</h4>
-        <p><strong>Open Date:</strong> Oct 15, 2026 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Close Date:</strong> Oct 17, 2026</p>
-        <p><strong>Issue Price:</strong> ₹1865 - ₹1960 &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Lot Size:</strong> 7 Shares</p>
-        <hr>
-        <p><strong>Current GMP:</strong> <span style="color:#FF5252; font-weight:bold; font-size:18px;">-₹15</span> <span style="color:gray;">(-0.7%)</span></p>
-        <p><strong>Est. Listing Price:</strong> ₹1945</p>
+    <div class="metric-card">
+        <table style="width:100%; text-align:left; border-collapse: collapse;">
+            <tr style="color:gray; border-bottom:1px solid #333;">
+                <th style="padding-bottom:10px;">Company</th>
+                <th style="padding-bottom:10px;">Opening date</th>
+                <th style="padding-bottom:10px;">Est. GMP</th>
+            </tr>
+            <tr style="border-bottom:1px solid #333;">
+                <td style="padding:15px 0;"><strong>HD Fire Protect</strong></td>
+                <td>13 Oct</td>
+                <td><span style="color:#00D09C;">+₹12 (15%)</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #333;">
+                <td style="padding:15px 0;"><strong>Ravita Engineering Services (SME)</strong></td>
+                <td>13 Oct</td>
+                <td><span style="color:#FF5252;">-₹2 (-1%)</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #333;">
+                <td style="padding:15px 0;"><strong>Fusion CX</strong></td>
+                <td>14 Oct</td>
+                <td><span style="color:#00D09C;">+₹25 (20%)</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #333;">
+                <td style="padding:15px 0;"><strong>Zetwerk</strong></td>
+                <td>To be announced</td>
+                <td><span style="color:gray;">TBA</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #333;">
+                <td style="padding:15px 0;"><strong>Reliance JIO</strong></td>
+                <td>To be announced</td>
+                <td><span style="color:#00D09C;">+₹85 (Expected)</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #333;">
+                <td style="padding:15px 0;"><strong>Zepto</strong></td>
+                <td>To be announced</td>
+                <td><span style="color:#00D09C;">+₹45 (Expected)</span></td>
+            </tr>
+            <tr>
+                <td style="padding:15px 0;"><strong>Razorpay</strong></td>
+                <td>To be announced</td>
+                <td><span style="color:gray;">TBA</span></td>
+            </tr>
+        </table>
     </div>
     """, unsafe_allow_html=True)
     st.caption("Disclaimer: GMP (Grey Market Premium) is highly volatile and indicative only. Sourced from community channels.")
