@@ -6,20 +6,20 @@ from quant_engine import fetch_advanced_data, run_quant_forecast, calculate_pivo
 from backtester import run_backtest
 from swarm_agents import run_aegis_swarm
 
-st.set_page_config(page_title="Groww AI Terminal", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Aegis Pro Terminal", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
-    .metric-card { background-color: #FFFFFF; padding: 20px; border-radius: 12px; border: 1px solid #E0E0E0; box-shadow: 0px 4px 6px rgba(0,0,0,0.05); }
-    .ipo-card { background-color: #FFFFFF; padding: 20px; border-radius: 12px; border: 1px solid #00D09C; margin-bottom: 15px; box-shadow: 0px 2px 4px rgba(0,0,0,0.05);}
-    .stApp { background-color: #F7F9F9; }
-    h1, h2, h3, p { color: #333333 !important; }
-    .agent-box { background-color: #FFFFFF; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #00D09C; box-shadow: 0px 2px 4px rgba(0,0,0,0.05);}
+    /* Premium Dark Mode Terminal CSS */
+    .metric-card { background-color: #1E1E1E; padding: 20px; border-radius: 12px; border: 1px solid #333; box-shadow: 0px 4px 6px rgba(0,0,0,0.5); color: white;}
+    .ipo-card { background-color: #1E1E1E; padding: 20px; border-radius: 12px; border: 1px solid #00BFFF; margin-bottom: 15px;}
+    .agent-box { background-color: #262730; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #00BFFF; color: white;}
+    hr { border-color: #333; }
 </style>
 """, unsafe_allow_html=True)
 
 st.sidebar.image("https://img.icons8.com/fluency/96/000000/bullish.png", width=60)
-st.sidebar.title("Groww AI Terminal")
+st.sidebar.title("Aegis Dark Terminal")
 page = st.sidebar.radio("Menu", ["📊 Explore & Technicals", "🤖 AI Swarm Fund", "🚀 IPO Allotment"])
 st.sidebar.markdown("---")
 
@@ -43,13 +43,13 @@ if page == "📊 Explore & Technicals":
             pivots = calculate_pivot_points(df)
             
             st.markdown(f"<h2>{raw_ticker} <span style='color:gray; font-size: 20px;'>{exchange}</span></h2>", unsafe_allow_html=True)
-            st.markdown(f"<h1 style='color: #00D09C;'>{currency}{current_price:.2f}</h1>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='color: #00BFFF;'>{currency}{current_price:.2f}</h1>", unsafe_allow_html=True)
             
             tab_overview, tab_tech = st.tabs(["Overview", "Technicals"])
             
             with tab_overview:
                 fig = go.Figure(data=[go.Candlestick(x=df['Date'], open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
-                fig.update_layout(height=400, template="plotly_white", margin=dict(l=0,r=0,t=0,b=0), xaxis_rangeslider_visible=False)
+                fig.update_layout(height=400, template="plotly_dark", margin=dict(l=0,r=0,t=0,b=0), xaxis_rangeslider_visible=False)
                 st.plotly_chart(fig, use_container_width=True)
                 
             with tab_tech:
@@ -58,11 +58,11 @@ if page == "📊 Explore & Technicals":
                 
                 with g_col1:
                     fig_gauge = go.Figure(go.Indicator(
-                        mode = "gauge+number", value = rsi, title = {'text': "Technical Sentiment (RSI)", 'font': {'size': 18, 'color': 'black'}},
-                        gauge = {'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "darkblue"}, 'bar': {'color': "#333333"}, 'bgcolor': "white", 'borderwidth': 2, 'bordercolor': "#E0E0E0",
-                            'steps': [{'range': [0, 40], 'color': "#FF5252"}, {'range': [40, 60], 'color': "#E0E0E0"}, {'range': [60, 100], 'color': "#00D09C"}]}
+                        mode = "gauge+number", value = rsi, title = {'text': "Technical Sentiment (RSI)", 'font': {'size': 18, 'color': 'white'}},
+                        gauge = {'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "white"}, 'bar': {'color': "#00BFFF"}, 'bgcolor': "#1E1E1E", 'borderwidth': 2, 'bordercolor': "#333",
+                            'steps': [{'range': [0, 40], 'color': "#FF5252"}, {'range': [40, 60], 'color': "#555555"}, {'range': [60, 100], 'color': "#00D09C"}]}
                     ))
-                    fig_gauge.update_layout(height=300, font={'color': "black"})
+                    fig_gauge.update_layout(height=300, font={'color': "white"}, paper_bgcolor="rgba(0,0,0,0)")
                     st.plotly_chart(fig_gauge, use_container_width=True)
                     
                 with g_col2:
@@ -71,7 +71,7 @@ if page == "📊 Explore & Technicals":
                     st.markdown(f"**R3**: {currency}{pivots['R3']:.2f}")
                     st.markdown(f"**R2**: {currency}{pivots['R2']:.2f}")
                     st.markdown(f"**R1**: {currency}{pivots['R1']:.2f}")
-                    st.markdown(f"<hr style='margin:5px;'><div style='text-align:center; background:#E0E0E0; border-radius:5px;'><strong>PIVOT {currency}{pivots['Pivot']:.2f}</strong></div><hr style='margin:5px;'>", unsafe_allow_html=True)
+                    st.markdown(f"<hr style='margin:5px;'><div style='text-align:center; background:#333; border-radius:5px;'><strong>PIVOT {currency}{pivots['Pivot']:.2f}</strong></div><hr style='margin:5px;'>", unsafe_allow_html=True)
                     st.markdown(f"**S1**: {currency}{pivots['S1']:.2f}")
                     st.markdown(f"**S2**: {currency}{pivots['S2']:.2f}")
                     st.markdown(f"**S3**: {currency}{pivots['S3']:.2f}")
@@ -104,8 +104,8 @@ elif page == "🤖 AI Swarm Fund":
                     st.success("Backtest Complete: Initial Capital ₹10,000")
                     fig_bt = go.Figure()
                     fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['Buy_Hold_Portfolio'], mode='lines', name='Buy & Hold'))
-                    fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['AI_Portfolio'], mode='lines', name='Aegis Managed', line=dict(color='#00D09C', width=2)))
-                    fig_bt.update_layout(height=400, template="plotly_white")
+                    fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['AI_Portfolio'], mode='lines', name='Aegis Managed', line=dict(color='#00BFFF', width=2)))
+                    fig_bt.update_layout(height=400, template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
                     st.plotly_chart(fig_bt, use_container_width=True)
 
 elif page == "🚀 IPO Allotment":
