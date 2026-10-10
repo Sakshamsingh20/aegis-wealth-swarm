@@ -2,174 +2,119 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import datetime
-from quant_engine import fetch_advanced_data, run_quant_forecast
+from quant_engine import fetch_advanced_data, run_quant_forecast, calculate_pivot_points
 from backtester import run_backtest
 from swarm_agents import run_aegis_swarm
 
-st.set_page_config(page_title="Aegis: Pro Wealth Terminal", page_icon="🛡️", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Groww AI Terminal", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
 
-# Custom CSS for a Bloomberg-Terminal-like experience
 st.markdown("""
 <style>
-    .big-font { font-size: 24px !important; font-weight: bold; color: #4CAF50;}
-    .agent-box { background-color: #1E1E1E; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #00BFFF;}
-    .ipo-card { background-color: #262730; padding: 20px; border-radius: 10px; border: 1px solid #4CAF50; margin-bottom: 15px;}
+    .metric-card { background-color: #FFFFFF; padding: 20px; border-radius: 12px; border: 1px solid #E0E0E0; box-shadow: 0px 4px 6px rgba(0,0,0,0.05); }
+    .ipo-card { background-color: #FFFFFF; padding: 20px; border-radius: 12px; border: 1px solid #00D09C; margin-bottom: 15px; box-shadow: 0px 2px 4px rgba(0,0,0,0.05);}
+    .stApp { background-color: #F7F9F9; }
+    h1, h2, h3, p { color: #333333 !important; }
+    .agent-box { background-color: #FFFFFF; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #00D09C; box-shadow: 0px 2px 4px rgba(0,0,0,0.05);}
 </style>
 """, unsafe_allow_html=True)
 
 st.sidebar.image("https://img.icons8.com/fluency/96/000000/bullish.png", width=60)
-st.sidebar.title("Aegis Terminal")
-page = st.sidebar.radio("Navigation", ["🤖 AI Swarm Analysis", "⚡ Intraday Screener", "🚀 IPO & Allotment Center"])
+st.sidebar.title("Groww AI Terminal")
+page = st.sidebar.radio("Menu", ["📊 Explore & Technicals", "🤖 AI Swarm Fund", "🚀 IPO Allotment"])
 st.sidebar.markdown("---")
 
-if page == "🤖 AI Swarm Analysis":
-    st.title("🛡️ Aegis: Multi-Agent AI Swarm")
-    st.markdown("Advanced ML & AI consensus engine for automated portfolio growth.")
-    
-    col1, col2 = st.sidebar.columns(2)
-    exchange = col1.selectbox("Market", ["NSE (India)", "US Market"])
-    raw_ticker = col2.text_input("Asset", value="RELIANCE").upper()
-    
-    # Auto-format for Indian stocks
-    if exchange == "NSE (India)" and not raw_ticker.endswith(".NS") and not raw_ticker.startswith("^"):
-        ticker = f"{raw_ticker}.NS"
-    else:
-        ticker = raw_ticker
+col1, col2 = st.sidebar.columns(2)
+exchange = col1.selectbox("Market", ["NSE", "US"])
+raw_ticker = col2.text_input("Asset", value="RELIANCE").upper()
 
+ticker = f"{raw_ticker}.NS" if (exchange == "NSE" and not raw_ticker.endswith(".NS") and not raw_ticker.startswith("^")) else raw_ticker
+currency = "₹" if "NSE" in exchange else "$"
+
+if page == "📊 Explore & Technicals":
+    st.title("📈 Stock Overview & Technicals")
+    
+    if st.sidebar.button("Analyze Stock", type="primary"):
+        with st.spinner("Fetching Data..."):
+            df = fetch_advanced_data(ticker, "6mo")
+            
+        if not df.empty:
+            current_price = df['Close'].iloc[-1]
+            rsi = df['RSI'].iloc[-1]
+            pivots = calculate_pivot_points(df)
+            
+            st.markdown(f"<h2>{raw_ticker} <span style='color:gray; font-size: 20px;'>{exchange}</span></h2>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='color: #00D09C;'>{currency}{current_price:.2f}</h1>", unsafe_allow_html=True)
+            
+            tab_overview, tab_tech = st.tabs(["Overview", "Technicals"])
+            
+            with tab_overview:
+                fig = go.Figure(data=[go.Candlestick(x=df['Date'], open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'])])
+                fig.update_layout(height=400, template="plotly_white", margin=dict(l=0,r=0,t=0,b=0), xaxis_rangeslider_visible=False)
+                st.plotly_chart(fig, use_container_width=True)
+                
+            with tab_tech:
+                st.markdown("### Summary (Based on 1D data)")
+                g_col1, g_col2 = st.columns([1, 1])
+                
+                with g_col1:
+                    fig_gauge = go.Figure(go.Indicator(
+                        mode = "gauge+number", value = rsi, title = {'text': "Technical Sentiment (RSI)", 'font': {'size': 18, 'color': 'black'}},
+                        gauge = {'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "darkblue"}, 'bar': {'color': "#333333"}, 'bgcolor': "white", 'borderwidth': 2, 'bordercolor': "#E0E0E0",
+                            'steps': [{'range': [0, 40], 'color': "#FF5252"}, {'range': [40, 60], 'color': "#E0E0E0"}, {'range': [60, 100], 'color': "#00D09C"}]}
+                    ))
+                    fig_gauge.update_layout(height=300, font={'color': "black"})
+                    st.plotly_chart(fig_gauge, use_container_width=True)
+                    
+                with g_col2:
+                    st.markdown("### Support and Resistance")
+                    st.markdown("<div class='metric-card'>", unsafe_allow_html=True)
+                    st.markdown(f"**R3**: {currency}{pivots['R3']:.2f}")
+                    st.markdown(f"**R2**: {currency}{pivots['R2']:.2f}")
+                    st.markdown(f"**R1**: {currency}{pivots['R1']:.2f}")
+                    st.markdown(f"<hr style='margin:5px;'><div style='text-align:center; background:#E0E0E0; border-radius:5px;'><strong>PIVOT {currency}{pivots['Pivot']:.2f}</strong></div><hr style='margin:5px;'>", unsafe_allow_html=True)
+                    st.markdown(f"**S1**: {currency}{pivots['S1']:.2f}")
+                    st.markdown(f"**S2**: {currency}{pivots['S2']:.2f}")
+                    st.markdown(f"**S3**: {currency}{pivots['S3']:.2f}")
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+elif page == "🤖 AI Swarm Fund":
+    st.title("🛡️ Aegis: Multi-Agent AI Swarm")
+    
     if st.sidebar.button("Deploy AI Swarm", type="primary"):
         with st.spinner(f"Fetching Institutional Data for {ticker}..."):
             df = fetch_advanced_data(ticker, "2y")
-            
-        if df is None or df.empty:
-            st.error(f"Insufficient data for {ticker}. Please check the symbol.")
-        else:
             current_price = df['Close'].iloc[-1]
             
-            tab1, tab2, tab3 = st.tabs(["📊 Live Swarm Analysis", "📈 Account Growth Backtest", "🧠 Swarm Brain Logs"])
+            with st.spinner("Training ML Model & Scraping News..."):
+                forecast_prices, ml_confidence = run_quant_forecast(df)
+                swarm_result = run_aegis_swarm(ticker, current_price, forecast_prices, ml_confidence, df)
             
+            tab1, tab2 = st.tabs(["AI Verdict", "Account Growth Backtest"])
             with tab1:
-                ccol1, ccol2, ccol3 = st.columns(3)
-                ccol1.metric("Current Price", f"₹{current_price:.2f}" if "NSE" in exchange else f"${current_price:.2f}")
-                ccol2.metric("RSI (14)", f"{df['RSI'].iloc[-1]:.1f}")
-                ccol3.metric("MACD", f"{df['MACD'].iloc[-1]:.2f}")
-                
-                with st.spinner("Training Gradient Boosting Quant Model..."):
-                    forecast_prices, ml_confidence = run_quant_forecast(df)
-                
-                fig = go.Figure()
-                fig.add_trace(go.Candlestick(x=df['Date'], open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'], name='Market'))
-                fig.add_trace(go.Scatter(x=df['Date'], y=df['SMA_50'], line=dict(color='orange', width=1), name='50 SMA'))
-                fig.add_trace(go.Scatter(x=df['Date'], y=df['SMA_200'], line=dict(color='blue', width=1), name='200 SMA'))
-                
-                last_date = df['Date'].iloc[-1]
-                future_dates = [last_date + datetime.timedelta(days=i) for i in range(1, 8)]
-                fig.add_trace(go.Scatter(x=[last_date] + future_dates, y=[current_price] + forecast_prices, mode='lines+markers', name='AI Quant Forecast', line=dict(color='#00ff00', width=3)))
-                
-                fig.update_layout(height=500, template="plotly_dark", xaxis_rangeslider_visible=False)
-                st.plotly_chart(fig, use_container_width=True)
-                
-                with st.spinner("Initializing AI Swarm & Scraping News..."):
-                    swarm_result = run_aegis_swarm(ticker, current_price, forecast_prices, ml_confidence, df)
-                
                 exec_data = swarm_result['execution']
-                decision_color = "green" if exec_data['decision'] == "BUY" else "red" if exec_data['decision'] == "SELL" else "gray"
-                st.markdown(f"<p style='font-size: 30px; font-weight: bold; color: {decision_color};'>ACTION: {exec_data['decision']} (Confidence: {exec_data['confidence_score']}%)</p>", unsafe_allow_html=True)
-                st.info(f"**Reasoning:** {exec_data['reasoning']}")
-
-            with tab2:
-                with st.spinner("Running historical backtest..."):
-                    bt_df, bt_metrics = run_backtest(df)
-                if bt_df is not None:
-                    st.success("Backtest Complete: Initial Capital ₹10,000")
-                    mcol1, mcol2, mcol3 = st.columns(3)
-                    mcol1.metric("Buy & Hold Return", bt_metrics['BH_Total_Return'])
-                    mcol2.metric("AI Swarm Return", bt_metrics['AI_Total_Return'], delta=bt_metrics['Alpha_Generated'])
-                    mcol3.metric("Final Value", bt_metrics['AI_Final_Value'].replace("$", "₹") if "NSE" in exchange else bt_metrics['AI_Final_Value'])
-                    
-                    fig_bt = go.Figure()
-                    fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['Buy_Hold_Portfolio'], mode='lines', name='Buy & Hold'))
-                    fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['AI_Portfolio'], mode='lines', name='Aegis Managed'))
-                    fig_bt.update_layout(height=400, template="plotly_dark")
-                    st.plotly_chart(fig_bt, use_container_width=True)
-
-            with tab3:
+                decision_color = "#00D09C" if exec_data['decision'] == "BUY" else "#FF5252" if exec_data['decision'] == "SELL" else "gray"
+                st.markdown(f"<h2 style='color: {decision_color};'>ACTION: {exec_data['decision']} (Confidence: {exec_data['confidence_score']}%)</h2>", unsafe_allow_html=True)
+                
                 for log in swarm_result['logs']:
                     st.markdown(f"<div class='agent-box'><strong>{log['agent']}</strong><br>{log['content']}</div>", unsafe_allow_html=True)
-
-elif page == "⚡ Intraday Screener":
-    st.title("⚡ Intraday Momentum Screener")
-    st.markdown("Live technical analysis of top Nifty 50 stocks to detect Bullish/Bearish intraday momentum.")
-    
-    if st.button("Scan Indian Market Now"):
-        with st.spinner("Scanning Nifty Top Movers..."):
-            # Hardcoded list for demo purposes
-            top_stocks = ["HDFCBANK.NS", "RELIANCE.NS", "INFY.NS", "ICICIBANK.NS", "TCS.NS"]
-            results = []
             
-            for sym in top_stocks:
-                try:
-                    df = fetch_advanced_data(sym, "1mo") # Short timeframe for Intraday proxy
-                    rsi = df['RSI'].iloc[-1]
-                    macd = df['MACD'].iloc[-1]
-                    price = df['Close'].iloc[-1]
-                    
-                    if rsi > 70:
-                        signal, color = "Overbought (Bearish)", "red"
-                    elif rsi < 30:
-                        signal, color = "Oversold (Bullish)", "green"
-                    elif macd > 0:
-                        signal, color = "Momentum (Bullish)", "green"
-                    else:
-                        signal, color = "Weakness (Bearish)", "red"
-                        
-                    results.append({"Stock": sym.replace(".NS", ""), "Price": f"₹{price:.2f}", "RSI": f"{rsi:.1f}", "MACD": f"{macd:.2f}", "Signal": signal})
-                except:
-                    pass
-            
-            st.table(pd.DataFrame(results))
-            st.caption("Signals generated via RSI and MACD crossovers.")
+            with tab2:
+                bt_df, bt_metrics = run_backtest(df)
+                if bt_df is not None:
+                    st.success("Backtest Complete: Initial Capital ₹10,000")
+                    fig_bt = go.Figure()
+                    fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['Buy_Hold_Portfolio'], mode='lines', name='Buy & Hold'))
+                    fig_bt.add_trace(go.Scatter(x=bt_df['Date'], y=bt_df['AI_Portfolio'], mode='lines', name='Aegis Managed', line=dict(color='#00D09C', width=2)))
+                    fig_bt.update_layout(height=400, template="plotly_white")
+                    st.plotly_chart(fig_bt, use_container_width=True)
 
-elif page == "🚀 IPO & Allotment Center":
+elif page == "🚀 IPO Allotment":
     st.title("🚀 IPO Desk: GMP & Allotment")
-    st.markdown("Track upcoming Indian IPOs, Grey Market Premium (GMP), and check allotment status.")
-    
-    tab_ipo, tab_allot = st.tabs(["Upcoming IPOs & GMP", "Check Allotment Status"])
-    
-    with tab_ipo:
-        st.markdown("### 🔔 Live IPO Pipeline")
-        st.markdown("""
-        <div class='ipo-card'>
-            <h4>Swiggy Ltd. IPO</h4>
-            <p><strong>Expected Price Band:</strong> ₹370 - ₹390 | <strong>Est. GMP:</strong> <span style='color:green;'>+₹120 (30%)</span></p>
-            <p><strong>Status:</strong> Upcoming (Draft Filed)</p>
-        </div>
-        <div class='ipo-card'>
-            <h4>Hyundai Motor India IPO</h4>
-            <p><strong>Expected Price Band:</strong> ₹1865 - ₹1960 | <strong>Est. GMP:</strong> <span style='color:orange;'>+₹65 (3%)</span></p>
-            <p><strong>Status:</strong> Subscriptions Closed</p>
-        </div>
-        <div class='ipo-card'>
-            <h4>NTPC Green Energy</h4>
-            <p><strong>Expected Price Band:</strong> TBA | <strong>Est. GMP:</strong> TBA</p>
-            <p><strong>Status:</strong> DRHP Filed</p>
-        </div>
-        """, unsafe_allow_html=True)
-        st.caption("Note: GMP is scraped from community grey market feeds and is highly volatile. Data shown is mocked for portfolio demonstration as live GMP APIs are restricted.")
-        
-    with tab_allot:
-        st.markdown("### 🏦 PAN Allotment Checker")
-        st.info("Directly check your IPO allotment status via Registrar API endpoints.")
-        
-        col1, col2 = st.columns(2)
-        selected_ipo = col1.selectbox("Select IPO", ["Hyundai Motor India", "Swiggy Ltd (Upcoming)", "Bajaj Housing Finance"])
-        pan_number = col2.text_input("Enter PAN Number", max_chars=10).upper()
-        
-        if st.button("Verify Allotment"):
-            if len(pan_number) != 10:
-                st.error("Please enter a valid 10-character PAN card number.")
-            else:
-                with st.spinner("Connecting to Registrar (LinkIntime/KFintech) via encrypted gateway..."):
-                    import time
-                    time.sleep(2) # Simulating API call
-                    st.error(f"⚠️ Registration API Blocked: Automated PAN queries are restricted by Indian registrars due to CAPTCHA protections. To check allotment for {selected_ipo}, please visit the official registrar website directly.")
-                    st.markdown(f"[Click here to check {selected_ipo} on KFintech](https://kosmic.kfintech.com/ipostatus/)")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""<div class='ipo-card'><h4>Swiggy Ltd. IPO</h4><p><strong>Est. GMP:</strong> <span style='color:#00D09C;'>+₹120 (30%)</span></p></div>""", unsafe_allow_html=True)
+    with col2:
+        st.info("Check Allotment Status")
+        st.selectbox("Select IPO", ["Swiggy Ltd", "Hyundai Motor"])
+        st.text_input("Enter PAN Number", max_chars=10)
+        st.button("Verify Allotment (Redirects to KFintech)")
